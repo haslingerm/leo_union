@@ -9,7 +9,7 @@
 
     <PropertyGroup>
         <PackageId>HTLLeonding.Utility.LeoUnion</PackageId>
-        <Version>1.0.0</Version>
+        <Version>1.0.1</Version>
         <Title>HTL Leonding Union Types</Title>
         <Description>Generic ad-hoc union types for C# 15: Union&lt;T1, ..., T10&gt;, plus marker types for common outcomes (Success, NotFound, Conflict, Error)</Description>
         <Authors>M. Haslinger</Authors>

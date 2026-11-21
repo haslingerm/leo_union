@@ -67,11 +67,17 @@ missing cases are still reported:
 switch (GetRocket(id))
 {
     case Rocket rocket:
+    {
         return rocket.Name;
+    }
     case NotFound:
+    {
         return "No such rocket";
+    }
     default:
+    {
         throw new UnreachableException(); // guard; LA0003 still reports missing cases
+    }
 }
 ```
 
