@@ -41,11 +41,17 @@ public sealed class ReadmeExamplesTests
             switch (GetRocket(id))
             {
                 case Rocket rocket:
+                {
                     return rocket.Name;
+                }
                 case NotFound:
+                {
                     return "No such rocket";
+                }
                 default:
+                {
                     throw new UnreachableException();
+                }
             }
         }
     }
