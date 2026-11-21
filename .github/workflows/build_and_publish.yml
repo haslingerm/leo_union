@@ -1,0 +1,51 @@
+name: Build & Publish NuGet
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    env:
+      BUILD_CONFIG: 'Release'
+      NUGET_DIR: ${{ github.workspace }}/nupkgs
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write # required to obtain the OIDC token for NuGet trusted publishing
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 11.0.x
+      - name: Verify generated code is up to date
+        run: |
+          dotnet run tools/Generate.cs
+          git diff --exit-code -- '*.g.cs'
+      - name: Build
+        run: dotnet build LeoUnion.slnx -c ${{ env.BUILD_CONFIG }}
+      - name: Test
+        run: dotnet test --solution LeoUnion.slnx -c ${{ env.BUILD_CONFIG }} --no-build
+      - name: Pack
+        run: dotnet pack LeoUnion/LeoUnion.csproj -c ${{ env.BUILD_CONFIG }} --no-build --output ${{ env.NUGET_DIR }}
+      - name: NuGet login (trusted publishing)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          # NUGET_USER is just the public nuget.org account name, so it can be configured
+          # either as a repository/organization variable or as a secret.
+          user: ${{ vars.NUGET_USER || secrets.NUGET_USER }}
+      - name: Publish
+        working-directory: ${{ env.NUGET_DIR }}
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push "*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
+      - name: Upload NuGet packages as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: NuGet Packages
+          path: ${{ env.NUGET_DIR }}/*
+          retention-days: 1

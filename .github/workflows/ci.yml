@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 11.0.x
+      - name: Verify generated code is up to date
+        run: |
+          dotnet run tools/Generate.cs
+          git diff --exit-code -- '*.g.cs'
+      - name: Build
+        run: dotnet build LeoUnion.slnx -c Release
+      - name: Test
+        run: dotnet test --solution LeoUnion.slnx -c Release --no-build

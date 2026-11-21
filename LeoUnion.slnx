@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="LeoUnion/LeoUnion.csproj" />
+  <Project Path="LeoUnion.Tests/LeoUnion.Tests.csproj" />
+</Solution>
